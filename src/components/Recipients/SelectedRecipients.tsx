@@ -5,6 +5,7 @@ import {
   AccordionPanel,
   AccordionIcon,
   Box,
+  Button,
   CloseButton,
 } from "@chakra-ui/react";
 import { useState, useEffect } from "react";
@@ -14,6 +15,7 @@ import { groupEmailsByCompany } from "./data";
 const SelectedRecipients = (props: SelectedRecipientProps) => {
   const { recipients, deselectRecipients } = props;
   const [selectedRecipients, setSelectedRecipients] = useState({});
+  const emailsByCompany = groupEmailsByCompany(recipients);
 
   /**
    * Filters through recipients to find selected emails, compares
@@ -22,7 +24,6 @@ const SelectedRecipients = (props: SelectedRecipientProps) => {
   const groupSelectedEmailData = () => {
     const selected = recipients.filter((r) => r.isSelected === true);
     const selectedEmailsByCompany = groupEmailsByCompany(selected);
-    const emailsByCompany = groupEmailsByCompany(recipients);
     const emailRecipients = [];
     const companyRecipients = [];
     Object.keys(selectedEmailsByCompany).map((key) => {
@@ -46,7 +47,7 @@ const SelectedRecipients = (props: SelectedRecipientProps) => {
     setSelectedRecipients(groupSelectedEmailData());
   }, [recipients]);
 
-  const emailDisplay = (e: string) => {
+  const emailDisplay = (e: string, padding?: string) => {
     return (
       <Box
         key={`${e}-selected`}
@@ -55,9 +56,9 @@ const SelectedRecipients = (props: SelectedRecipientProps) => {
         textAlign="left"
         justifyContent="space-between"
         display="flex"
-        padding={"0.5rem 1rem"}
+        padding={padding ? padding : "0.5rem 1rem"}
       >
-        <span>{e}</span>
+        <span style={{wordBreak: "break-word"}}>{e}</span>
         <CloseButton size="sm" onClick={() => deselectRecipients([e])} />
       </Box>
     );
@@ -114,29 +115,49 @@ const SelectedRecipients = (props: SelectedRecipientProps) => {
               <AccordionItem key={key}>
                 {accordionTitle("Company Recipients")}
                 <AccordionPanel pb={4}>
-                  {items.length > 0
-                    ? items.map((company) => {
+                  {items.length > 0 ? (
+                    <Accordion allowMultiple={true}>
+                      {items.map((company) => {
+                        const emails = emailsByCompany[company];
                         return (
-                          <Box
-                            key={`${company}-company-selected`}
-                            as="span"
-                            flex="1"
-                            textAlign="left"
-                            justifyContent="space-between"
-                            display="flex"
-                            padding={"0.5rem 1rem"}
-                          >
-                            <span>{company}</span>
-                            <CloseButton
-                              size="sm"
-                              onClick={() => {
-                                deselectAllEmailsForCompany(company);
-                              }}
-                            />
-                          </Box>
+                          <AccordionItem key={company}>
+                            <AccordionButton>
+                              <AccordionIcon />
+                              <Box
+                                key={`${company}-company-selected`}
+                                as="span"
+                                flex="1"
+                                textAlign="left"
+                                justifyContent="space-between"
+                                display="flex"
+                                padding={"0rem 1rem"}
+                              >
+                                <span>{company}</span>
+                                <Button
+                                  size="sm"
+                                  color="red"
+                                  variant="outline"
+                                  onClick={() => {
+                                    deselectAllEmailsForCompany(company);
+                                  }}
+                                >
+                                  Remove
+                                </Button>
+                              </Box>
+                            </AccordionButton>
+
+                            <AccordionPanel pb={4}>
+                              {emails.map((e) => {
+                                return emailDisplay(e.email, "0rem 2rem");
+                              })}
+                            </AccordionPanel>
+                          </AccordionItem>
                         );
-                      })
-                    : emptyState("company")}
+                      })}
+                    </Accordion>
+                  ) : (
+                    emptyState("company")
+                  )}
                 </AccordionPanel>
               </AccordionItem>
             );

@@ -87,6 +87,7 @@ const AvailableRecipients = (props: AvailableRecipientsProps) => {
           textAlign="left"
           display="block"
           padding={"0.5rem 1rem"}
+          style={{ wordBreak: "break-word" }}
         >
           {e.email}
         </Box>
