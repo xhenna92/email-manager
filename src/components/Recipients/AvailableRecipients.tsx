@@ -6,44 +6,24 @@ import {
     AccordionIcon,
     Box,
     Button,
-    Center,
     Checkbox,
-    Heading,
     Input,
     InputGroup,
     InputRightElement,
-    Stack,
 } from '@chakra-ui/react'
 import { useState, useEffect } from 'react';
+import Layout from './Layout';
+import { isValidEmail, groupEmailsByCompany } from './data';
 
 const AvailableRecipients = (props: AvailableRecipientsProps) => {
     const { recipients, addRecipient, selectRecipients, deselectRecipients} = props;
     const [filteredEmails, setFilteredEmails] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
     const [showAddBtn, setShowAddBtn] = useState(false);
+    const [addPressed, setAddPressed] = useState(false);
 
-    const groupByCompany = (emails) => {
-        const emailsByCompany = {};
-        emails.forEach((e) => {
-            const key = e.email.split('@')[1];
-            if (emailsByCompany[key]) {
-                const emailsForKey = emailsByCompany[key];
-                emailsForKey.push(e);
-                emailsByCompany[key] = emailsForKey;
-            } else {
-                emailsByCompany[key] = [e];
-            }
-        });
-        return emailsByCompany;
-    }
-
-    const isValidEmail = (email) => {
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        return emailRegex.test(email);
-    }
-
-    const filterEmailsWithTerm = (s) => {
-        const emails = groupByCompany(recipients.filter(function (e) {
+    const filterEmailsWithTerm = (s: string) => {
+        const emails = groupEmailsByCompany(recipients.filter(function (e) {
             return e.email.includes(s);
         }));
 
@@ -65,7 +45,14 @@ const AvailableRecipients = (props: AvailableRecipientsProps) => {
         return () => clearTimeout(delayDebounceFn)
     }, [searchTerm]);
 
-    const emailDisplay = (e) => {
+    useEffect(() => {
+        if (addPressed) {
+            setShowAddBtn(false);
+            setAddPressed(false);
+        }
+    }, [addPressed]);
+
+    const emailDisplay = (e: { email: string, isSelected: boolean }) => {
         return <Checkbox
         key={`${e.email}-available`}
         size="md"
@@ -78,13 +65,11 @@ const AvailableRecipients = (props: AvailableRecipientsProps) => {
         </Checkbox>; 
     };
 
-    return <Box borderWidth='1px' borderRadius='lg' overflow='hidden' padding="0.5rem">
-        <Stack mt='6' spacing='3'>
-            <Center><Heading size='md' >Available Recipients</Heading></Center>
+    return <Layout title="Available Recipients">
             <InputGroup size='md'>
-                <Input placeholder='Search' onChange={(e) => setSearchTerm(e.target.value)} />
+            <Input placeholder='Search' onChange={(e) => setSearchTerm(e.target.value)} />
                 <InputRightElement width='4.5rem' visibility={showAddBtn ? 'visible': 'hidden'}>
-                    <Button h='1.75rem' size='sm' onClick={()=>addRecipient(searchTerm)}>
+                <Button h='1.75rem' size='sm' onClick={() => {setAddPressed(true); addRecipient(searchTerm);}}>
                         Add
                     </Button>
                 </InputRightElement>
@@ -120,8 +105,7 @@ const AvailableRecipients = (props: AvailableRecipientsProps) => {
                         </AccordionItem>
                     })}
             </Accordion>
-        </Stack>
-    </Box>;
+    </Layout>;
 }
 
 declare interface AvailableRecipientsProps {

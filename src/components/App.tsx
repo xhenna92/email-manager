@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChakraProvider, SimpleGrid, Box, Container } from '@chakra-ui/react'
-import AvailableRecipients from "./AvailableRecipients";
-import SelectedRecipients from "./SelectedRecipients";
+import AvailableRecipients from "./Recipients/AvailableRecipients";
+import SelectedRecipients from "./Recipients/SelectedRecipients";
 import recipientsData from "../assets/recipientsData.json";
 import { ReactComponent as TimescaleLogo } from "../assets/logo.svg";
 
@@ -12,7 +12,6 @@ const App = () => {
     }
 
     const handleUpdateRecipients = (emails: string[], isSelected: boolean) => {
-        console.log(emails);
         const newRecipients = [...recipients];
         emails.forEach((email) => {
             const recipient = newRecipients.find(r => r.email === email);
