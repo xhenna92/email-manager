@@ -1,4 +1,4 @@
-const {isValidEmail} = require("./data");
+const { isValidEmail } = require("./data");
 
 test("empty string is not an email", () => {
   expect(isValidEmail("")).toBe(false);

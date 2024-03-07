@@ -119,41 +119,53 @@ const AvailableRecipients = (props: AvailableRecipientsProps) => {
       </InputGroup>
 
       <Accordion allowMultiple={true}>
-        {Object.keys(filteredEmails).map((key) => {
-          const emailsForKey = filteredEmails[key];
-          if (emailsForKey.length === 1) {
-            return emailDisplay(emailsForKey[0]);
-          }
-          return (
-            <AccordionItem key={key}>
-              <Checkbox
-                key={`${key}-available`}
-                size="md"
-                width="100%"
-                isChecked={emailsForKey.every((em) => em.isSelected === true)}
-                onChange={(ev) => {
-                  ev.target.checked
-                    ? selectRecipients(emailsForKey.map((e) => e.email))
-                    : deselectRecipients(emailsForKey.map((e) => e.email));
-                }}
-              >
-                <h2>
-                  <AccordionButton>
-                    <Box as="h4" flex="1" textAlign="left" fontWeight="bold">
-                      {key}
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
-              </Checkbox>
-              <AccordionPanel pb={4}>
-                {emailsForKey.map((e) => {
-                  return emailDisplay(e);
-                })}
-              </AccordionPanel>
-            </AccordionItem>
-          );
-        })}
+        {Object.keys(filteredEmails).length > 0 ? (
+          Object.keys(filteredEmails).map((key) => {
+            const emailsForKey = filteredEmails[key];
+            if (emailsForKey.length === 1) {
+              return emailDisplay(emailsForKey[0]);
+            }
+            return (
+              <AccordionItem key={key}>
+                <Checkbox
+                  key={`${key}-available`}
+                  size="md"
+                  width="100%"
+                  isChecked={emailsForKey.every((em) => em.isSelected === true)}
+                  onChange={(ev) => {
+                    ev.target.checked
+                      ? selectRecipients(emailsForKey.map((e) => e.email))
+                      : deselectRecipients(emailsForKey.map((e) => e.email));
+                  }}
+                >
+                  <h2>
+                    <AccordionButton>
+                      <Box as="h4" flex="1" textAlign="left" fontWeight="bold">
+                        {key}
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                  </h2>
+                </Checkbox>
+                <AccordionPanel pb={4}>
+                  {emailsForKey.map((e) => {
+                    return emailDisplay(e);
+                  })}
+                </AccordionPanel>
+              </AccordionItem>
+            );
+          })
+        ) : (
+          <Box
+            as="span"
+            flex="1"
+            textAlign="center"
+            display="block"
+            padding={"0.5rem 1rem"}
+          >
+            No results
+          </Box>
+        )}
       </Accordion>
     </Layout>
   );
